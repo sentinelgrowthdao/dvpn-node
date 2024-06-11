@@ -330,8 +330,8 @@ func (c *NodeConfig) Validate() error {
 	if c.Type == "" {
 		return errors.New("type cannot be empty")
 	}
-	if c.Type != "wireguard" && c.Type != "v2ray" {
-		return errors.New("type must be either wireguard or v2ray")
+	if c.Type != "wireguard" && c.Type != "v2ray" && c.Type != "openconnect" {
+		return errors.New("type must be either wireguard, v2ray or openconnect")
 	}
 
 	return nil

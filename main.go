@@ -25,6 +25,7 @@ func main() {
 		cmd.KeysCmd(),
 		v2ray.Command(),
 		wireguard.Command(),
+		openconnect.Command(),
 		cmd.StartCmd(),
 		version.NewVersionCommand(),
 	)

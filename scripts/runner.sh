@@ -75,6 +75,11 @@ function cmd_init {
     must_run wireguard config set "${1}" "${2}"
   }
 
+  function openconnect_config_set {
+    echo "Setting the OpenConnect configuration key=${1}, value=${2}"
+    must_run openconnect config set "${1}" "${2}"
+  }
+
   function cmd_init_config {
     function generate_moniker {
       id=$(docker create "${NODE_IMAGE}") &&
@@ -242,6 +247,23 @@ function cmd_init {
     wireguard_config_set "listen_port" "${listen_port}"
   }
 
+  function cmd_init_openconnect {
+    function cmd_help {
+      echo "Usage: ${0} init openconnect COMMAND OPTIONS"
+      echo ""
+      echo "Commands:"
+      echo "  help    Print the help message"
+      echo ""
+      echo "Options:"
+      echo "  -f, --force    Force the initialization"
+    }
+
+    echo "Initializing the OpenConnect configuration..."
+    must_run openconnect config init --force="${force}"
+
+    # TODO: Fill up with configuration options
+  }
+
   function cmd_init_all {
     function cmd_help {
       echo "Usage: ${0} init all COMMAND OPTIONS"
@@ -264,6 +286,7 @@ function cmd_init {
     cmd_init_config "${@}"
     [[ "${NODE_TYPE}" == "v2ray" ]] && cmd_init_v2ray "${@}"
     [[ "${NODE_TYPE}" == "wireguard" ]] && cmd_init_wireguard "${@}"
+    [[ "${NODE_TYPE}" == "openconnect" ]] && cmd_init_openconnect "${@}"
     cmd_init_keys "${@}"
   }
 
@@ -277,10 +300,11 @@ function cmd_init {
     echo "  keys         Initialize the keys"
     echo "  v2ray        Initialize the v2ray.toml file"
     echo "  wireguard    Initialize the wireguard.toml file"
+    echo "  openconnect  Initialize the openconnect.toml file"
   }
 
   v="${1:-help}" && case "${v}" in
-    "all" | "config" | "help" | "keys" | "v2ray" | "wireguard")
+    "all" | "config" | "help" | "keys" | "v2ray" | "wireguard" | "openconnect")
       shift || true
       cmd_init_"${v}" "${@}"
       ;;
@@ -413,6 +437,18 @@ function cmd_start {
       --sysctl net.ipv6.conf.default.forwarding=1 \
       --publish "${node_api_port}:${node_api_port}/tcp" \
       --publish "${port}:${port}/udp" \
+      "${NODE_IMAGE}" process start
+  fi
+  if [[ "${node_type}" == "openconnect" ]]; then
+    #TODO: Append what is neccessary for openconnect
+    docker run \
+      --detach="${detach}" \
+      --interactive \
+      --name="${CONTAINER_NAME}" \
+      --rm="${rm}" \
+      --tty \
+      --volume "${NODE_DIR}:/root/.sentinelnode" \
+      --publish "${node_api_port}:${node_api_port}/tcp" \
       "${NODE_IMAGE}" process start
   fi
 }

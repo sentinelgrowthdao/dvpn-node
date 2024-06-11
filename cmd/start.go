@@ -3,6 +3,7 @@ package cmd
 import (
 	"bufio"
 	"fmt"
+
 	"net/http"
 	"os/exec"
 	"path/filepath"
@@ -23,6 +24,7 @@ import (
 	"github.com/sentinel-official/dvpn-node/libs/geoip"
 	"github.com/sentinel-official/dvpn-node/lite"
 	"github.com/sentinel-official/dvpn-node/node"
+	"github.com/sentinel-official/dvpn-node/services/openconnect"
 	"github.com/sentinel-official/dvpn-node/services/v2ray"
 	"github.com/sentinel-official/dvpn-node/services/wireguard"
 	wgtypes "github.com/sentinel-official/dvpn-node/services/wireguard/types"
@@ -95,6 +97,8 @@ func StartCmd() *cobra.Command {
 				service = wireguard.NewWireGuard(wgtypes.NewIPPool(ipv4Pool, ipv6Pool))
 			} else if config.Node.Type == "v2ray" {
 				service = v2ray.NewV2Ray()
+			} else if config.Node.Type == "openconnect" {
+				service = openconnect.NewOpenConnect()
 			}
 
 			var (
